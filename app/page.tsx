@@ -306,7 +306,7 @@ const Page = () => {
                   </h3>
 
                   <p className='text-slate-500 text-center max-w-md'>
-                    TO enable the interactive map, Set up a Google Maps API key in env. local
+                    To enable the interactive map, Set up a Google Maps API key in env. local
                   </p>
                 </div>
               ) : (
