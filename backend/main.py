@@ -64,5 +64,58 @@ async def root():
   }
 
 
+@app.post("/api/analyze/image")
+async def analyze_image(file: UploadFile = File(...)):
+  """
+  Analyze flood risk based on uploaded image using gemini ai
+  """
+  try:
+    logger.info(f"Analyzing image file: {file.filename}")
+
+    # validate file 
+    if not file.content_type.startswith("image/"):
+      raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
+    
+    if file.size > 10 * 1024 * 1024:  # limit to 10MB
+      raise HTTPException(status_code=400, detail="File size exceeds the limit of 10MB.")
+    
+    # read image data 
+    image_data = await file.read()
+
+    try:
+      image = PILImage.open(io.BytesIO(image_data))
+
+      if image.mode != "RGB":
+        image = image.convert("RGB")
+
+    except Exception as img_error:
+      logger.error(f"Error processing image: {str(img_error)}")
+      raise HTTPException(status_code=400, detail="Invalid image format.")
+
+    prompt = """
+    Analyze this terrain image for flood risk assessment.
+    
+    Please provide:
+    1. Risk Level (Low/Medium/High/Very High)
+    2. Description of the risk based on what you see
+    3. 3-5 specific recommendations
+    4. Estimated elevation in meters
+    5. Estimated distance from water bodies in meters
+    6. What water bodies or flood risks you can identify in the image
+
+    Format your response as JSON with these fields:
+    - risk_level
+    - description
+    - recommendations (array of strings)
+    - elevation (number)
+    - distance_from_water (number)
+    - image_analysis (string describing what you see)
+    """
+
+    
+  except Exception as e:
+    logger.error(f"Error analyzing image: {str(e)}")
+    raise HTTPException(status_code=500, detail="An error occurred while analyzing the image.")
+
 if __name__ == "__main__":
   uvicorn.run('main:app', host='localhost', port=8000, reload=True, log_level="info")
