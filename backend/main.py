@@ -85,6 +85,51 @@ def parse_gemini_response(response_text: str) -> dict:
         "image_analysis": response_text
       }
 
+def generate_image_risk_assessment() -> dict:
+  """Generate a simulated risk assessment for testing purposes."""
+  import random
+
+  risk_level = random.choice(["Low", "Medium", "High", "Very High"])
+
+  descriptions = {
+    "Low": "Image analysis shows low flood risk terrain.",
+    "Medium": "Image analysis indicates moderate flood risk with some water bodies nearby.",
+    "High": "Image analysis reveals high flood risk characteristics.",
+    "Very High": "Image analysis shows very high flood risk indicators."
+  }
+
+  # generate recommendations 
+  recommendations = {
+    "Low": [
+      "Continue monitoring terrain changes",
+      "Maintain current drainage systems",
+      "Stay informed about weather patterns"
+    ],
+    "Medium": [
+      "Improve drainage infrastructure",
+      "Consider flood monitoring systems",
+      "Develop emergency response plan"
+    ],
+    "High" : [
+      "Install comprehensive flood barriers",
+      "Implement early warning systems",
+      "Consider structural reinforcements"
+    ],
+    "Very High": [
+      "Immediate flood protection measures needed",
+      "Consider relocation to higher ground",
+      "Implement comprehensive emergency protocols"
+    ]
+  }
+
+  return {
+    "risk_level": risk_level,
+    "description": descriptions[risk_level],
+    "recommendations": recommendations[risk_level],
+    "elevation": round(random.uniform(10, 100), 1),  # Simulated elevation
+    "distance_from_water": round(random.uniform(200, 2000), 1)  # Simulated distance from water bodies
+  }
+
 @app.get("/")
 async def root():
   return {
