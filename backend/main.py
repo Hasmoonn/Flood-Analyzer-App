@@ -54,6 +54,37 @@ class AnalysisResponse(BaseModel):
   message: str
 
 
+def parse_gemini_response(response_text: str) -> dict:
+  """Parse the Gemini AI response to extract structured data."""
+
+  try:
+    # try to extract JSON from the response 
+    json_match = re.search(r"\{.*\}", response_text, re.DOTALL)
+
+    if json_match:
+      json_str = json_match.group()
+      parsed_data = json.loads(json_str)
+
+      return {
+        "risk_level": parsed_data.get("risk_level", "Medium"),
+        "description": parsed_data.get("description", "Analysis Completed."),
+        "recommendations": parsed_data.get("recommendations", []),
+        "elevation": parsed_data.get("elevation", 50.0),
+        "distance_from_water": parsed_data.get("distance_from_water", 1000.0),
+        "image_analysis": parsed_data.get("image_analysis", "")
+      }
+    
+  except Exception as e: 
+    logger.error(f"Error analyzing image: {str(e)}")
+    return {
+        "risk_level": "Medium",
+        "description": "Analysis Completed with default values.",
+        "recommendations": ["Monitor local weather forecasts", "Ensure proper drainage", "Have an evacuation plan"],
+        "elevation": 50.0,
+        "distance_from_water": 1000.0,
+        "image_analysis": response_text
+      }
+
 @app.get("/")
 async def root():
   return {
@@ -112,7 +143,26 @@ async def analyze_image(file: UploadFile = File(...)):
     - image_analysis (string describing what you see)
     """
 
-    
+    try:
+      model = genai.GenerativeModel("gemini-2.0-flash-exp")
+      response = model.generate_content(prompt, image=image)
+
+      parsed_data = parse_gemini_response(response.text)
+
+    except Exception as genai_error:
+      logger.error(f"Error generating response from Gemini: {str(genai_error)}")
+      parsed_data = generate_image_risk_assessment()
+      parsed_data["image_analysis"] = "Image analysis was not available, using simulated assessment"
+      raise HTTPException(status_code=500, detail="Error analyzing image with Gemini AI.")
+
+
+    return {
+      success: True,
+      **parsed_data,
+      "ai_analysis": parsed_data.get("image_analysis", ""),
+      message: "Image analyzed successfully using Gemini AI."
+    }
+
   except Exception as e:
     logger.error(f"Error analyzing image: {str(e)}")
     raise HTTPException(status_code=500, detail="An error occurred while analyzing the image.")
