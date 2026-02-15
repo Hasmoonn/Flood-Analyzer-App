@@ -202,10 +202,10 @@ async def analyze_image(file: UploadFile = File(...)):
 
 
     return {
-      success: True,
+      "success": True,
       **parsed_data,
       "ai_analysis": parsed_data.get("image_analysis", ""),
-      message: "Image analyzed successfully using Gemini AI."
+      "message": "Image analyzed successfully using Gemini AI."
     }
 
   except Exception as e:
