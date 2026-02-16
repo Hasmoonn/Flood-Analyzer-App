@@ -28,7 +28,7 @@ interface FloodRiskData {
 
 const Page = () => {
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+  const API_BASE_URL = "https://flood-analysis-service.onrender.com"
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
