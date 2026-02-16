@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client";
 
 import { AlertTriangle, Camera, CheckCircle, Globe, ImageIcon, Info, Loader2, Map, MapPin, Shield, TrendingUp, Upload } from 'lucide-react';
@@ -81,11 +84,11 @@ const Page = () => {
   }
 
   const getRiskVariant = (riskLevel: string) => {
-    riskLevel === "Very High" || riskLevel === "High" ? "destructive" : riskLevel === "Medium" ? "secondary" : "default";
+    return riskLevel === "Very High" || riskLevel === "High" ? "destructive" : riskLevel === "Medium" ? "secondary" : "default";
   }
 
   const getRiskIcon = (riskLevel: string) => {
-    riskLevel === "Very High" || riskLevel === "High" ? (
+    return riskLevel === "Very High" || riskLevel === "High" ? (
       <AlertTriangle className='h-4 w-4' />) : riskLevel === "Medium" ? (
         <Info className='h-4 w-4' /> ) : (
           <CheckCircle className='h-4 w-4' />
@@ -145,17 +148,17 @@ const Page = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100'>
+    <div className='min-h-screen bg-linear-to-br from-purple-100 via-indigo-100 to-purple-100'>
       <div className='container mx-auto px-4 py-8 max-w-6xl'>
         
         {/* header  */}
         <div className='text-center mb-8'>
           <div className='flex items-center justify-center mb-4'>
             <div className='p-3 bg-blue-100 rounded-full mr-4'>
-              <Globe className='h-8 w-8 text-blue-600' />
+              <Globe className='h6 w-6 md:h-8 md:w-8 text-blue-600' />
             </div>
 
-            <h1 className='text-3xl font-bold text-slate-900'>Flood Detection System</h1>
+            <h1 className='text-2xl md:text-3xl font-bold text-slate-900'>Flood Detection System</h1>
 
             
           </div>
@@ -236,9 +239,9 @@ const Page = () => {
                           <img src={imagePreview} alt="Preview" className='max-h-48 object-cover rounded-lg mx-auto shadow-sm' />
 
                           {/* button */}
-                          <Button className='w-full' onClick={() => {}}>
+                          <Button className='w-full' onClick={handleImageAnalysis} disabled={isLoading || !selectedImage}>
                             <ImageIcon className='h-4 w-4 mr-2'  />
-                            Analyze Image
+                            {isLoading ? "Analyzing Image..." : "Analyze Image"}
                           </Button>
                         </div>
                       )}
@@ -300,7 +303,7 @@ const Page = () => {
                     </div>
                     <div className="p-4 bg-slate-50 rounded-lg">
                       <div className="text-2xl font-bold text-blue-600">
-                        {floodRisk.distanceFromWater}m
+                        {floodRisk.distance_from_water}m
                       </div>
                       <div className="text-xs text-slate-500">From Water</div>
                     </div>
@@ -328,9 +331,7 @@ const Page = () => {
                     </h4>
                     <ul className="space-y-2">
                       {floodRisk.recommendations.map((rec, index) => (
-                        <li
-                          key={index}
-                          className="flex items-start gap-2 text-sm text-slate-600"
+                        <li key={index} className="flex items-start gap-2 text-sm text-slate-600"
                         >
                           <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
                           {rec}
