@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Globe, ImageIcon, Loader2, Map, MapPin, Shield, TrendingUp, Upload } from 'lucide-react';
+import { AlertTriangle, Camera, CheckCircle, Globe, ImageIcon, Info, Loader2, Map, MapPin, Shield, TrendingUp, Upload } from 'lucide-react';
 import React, { useRef, useState } from 'react'
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
@@ -78,6 +78,18 @@ const Page = () => {
     }
 
     return response.json();
+  }
+
+  const getRiskVariant = (riskLevel: string) => {
+    riskLevel === "Very High" || riskLevel === "High" ? "destructive" : riskLevel === "Medium" ? "secondary" : "default";
+  }
+
+  const getRiskIcon = (riskLevel: string) => {
+    riskLevel === "Very High" || riskLevel === "High" ? (
+      <AlertTriangle className='h-4 w-4' />) : riskLevel === "Medium" ? (
+        <Info className='h-4 w-4' /> ) : (
+          <CheckCircle className='h-4 w-4' />
+        )
   }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
