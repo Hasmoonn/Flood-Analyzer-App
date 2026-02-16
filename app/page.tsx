@@ -277,7 +277,6 @@ const Page = () => {
                               Remove
                             </Button>
                           </div>
-
                         </div>
                       )}
 
