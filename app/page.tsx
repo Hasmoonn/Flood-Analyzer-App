@@ -37,7 +37,7 @@ interface FloodRiskData {
   description: string;
   recommendations: string[];
   elevation: number;
-  distanceFromWater: number;
+  distance_from_water: number;
 }
 
 const Page = () => {
@@ -109,6 +109,40 @@ const Page = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleImageAnalysis = async () => {
+    if (!selectedImage) {
+      setAlertMessage("Please select an image to analyze");
+      setShowAlert(true);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData()
+      formData.append('file', selectedImage);
+
+      const apiResponse = await callAPI("/api/analyze/image", formData);
+
+      const riskData: FloodRiskData = {
+        riskLevel: apiResponse.riskLevel,
+        description: apiResponse.description,
+        recommendations: apiResponse.recommendations,
+        elevation: apiResponse.elevation,
+        distance_from_water: apiResponse.distance_from_water,
+      }
+
+      setFloodRisk(riskData)
+      setAiAnalysis(apiResponse.ai_analysis || "");
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+      setAlertMessage("Failed to analyze image. Please check your connection and try again.");
+      setShowAlert(true);
+    } finally{
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100'>
@@ -246,8 +280,7 @@ const Page = () => {
                       {getRiskIcon(floodRisk.riskLevel)}
                       <span className="font-semibold">Risk Level</span>
                     </div>
-                    <Badge
-                      variant={getRiskVariant(floodRisk.riskLevel)}
+                    <Badge variant={getRiskVariant(floodRisk.riskLevel)}
                       className="text-sm"
                     >
                       {floodRisk.riskLevel}
