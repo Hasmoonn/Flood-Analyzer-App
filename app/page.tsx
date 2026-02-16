@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+
 "use client";
 
 import { AlertTriangle, Camera, CheckCircle, Globe, ImageIcon, Info, Loader2, Map, MapPin, Shield, TrendingUp, Upload } from 'lucide-react';
@@ -8,32 +10,12 @@ import React, { useRef, useState } from 'react'
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from '@/components/ui/button';
+
 
 interface FloodRiskData {
   riskLevel: "Low" | "Medium" | "High" | "Very High";
@@ -42,6 +24,7 @@ interface FloodRiskData {
   elevation: number;
   distance_from_water: number;
 }
+
 
 const Page = () => {
 
@@ -113,6 +96,25 @@ const Page = () => {
     }
   };
 
+  const handleCoordinateSubmit = async () => {
+    if (!inputLat || !inputLng) {
+      setAlertMessage("Please enter both latitude and longitude");
+      setShowAlert(true);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      
+    } catch (error) {
+      console.error("Error analyzing coordinates:", error);
+      
+    } finally{
+      setIsLoading(false)
+    }
+  }
+
   const handleImageAnalysis = async () => {
     if (!selectedImage) {
       setAlertMessage("Please select an image to analyze");
@@ -180,8 +182,8 @@ const Page = () => {
             </CardHeader>
 
             <CardContent>
-              <Tabs defaultValue="coordinates">
-                <TabsList>
+              <Tabs defaultValue="coordinates" className='w-full'>
+                <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value='coordinates' className='flex items-center gap-2'>
                     <MapPin className='h-4 w-4'/> Coordinates
                   </TabsTrigger>
@@ -194,19 +196,36 @@ const Page = () => {
                   <div className='grid grid-cols-2 gap-4'>
                     <div className='space-y-2'>
                       <Label htmlFor='latitude'>Latitude</Label>
-                      <Input type='number' id='latitude' placeholder='Enter latitude' />
+                      <Input id="latitude" type="number"
+                        step="any"
+                        placeholder="40.7128"
+                        value={inputLat}
+                        onChange={(e) => setInputLat(e.target.value)} />
                     </div>
 
                     <div className='space-y-2'>
                       <Label htmlFor='longitude'>Longitude</Label>
-                      <Input type='number' id='longitude' placeholder='Enter longitude' />
+                      <Input id="longitude" type="number"
+                        step="any"
+                        placeholder="-74.0060"
+                        value={inputLng}
+                        onChange={(e) => setInputLng(e.target.value)} />
                     </div>
                   </div>
 
                   {/* button */}
-                  <Button className='w-full'>
-                    <MapPin className='h-4 w-4'  />
-                    Analyze Coordinates
+                  <Button className='w-full' onClick={handleCoordinateSubmit} disabled={isLoading || !inputLat || !inputLng} size="lg">
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      <>
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Analyze Coordinates
+                      </>
+                    )}
                   </Button>
                 </TabsContent>
 
@@ -238,15 +257,38 @@ const Page = () => {
                         <div className='space-y-4'>
                           <img src={imagePreview} alt="Preview" className='max-h-48 object-cover rounded-lg mx-auto shadow-sm' />
 
-                          {/* button */}
-                          <Button className='w-full' onClick={handleImageAnalysis} disabled={isLoading || !selectedImage}>
-                            <ImageIcon className='h-4 w-4 mr-2'  />
-                            {isLoading ? "Analyzing Image..." : "Analyze Image"}
-                          </Button>
+                          <div className="flex gap-2 justify-center">
+                            <Button
+                              onClick={() => fileInputRef.current?.click()}
+                              variant="outline"
+                              size="sm"
+                            >
+                              <Camera className="mr-2 h-4 w-4" />
+                              Change Image
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                setSelectedImage(null);
+                                setImagePreview("");
+                              }}
+                              variant="outline"
+                              size="sm"
+                            >
+                              Remove
+                            </Button>
+                          </div>
+
                         </div>
                       )}
+
+                      </div>
+                      
+                      {/* button */}
+                      <Button className='w-full' onClick={handleImageAnalysis} disabled={isLoading || !selectedImage} size="lg">
+                        <ImageIcon className='h-4 w-4 mr-2'  />
+                        {isLoading ? "Analyzing Image..." : "Analyze Image"}
+                      </Button>
                     </div>
-                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
