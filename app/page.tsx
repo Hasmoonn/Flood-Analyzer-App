@@ -42,6 +42,8 @@ interface FloodRiskData {
 
 const Page = () => {
 
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -60,6 +62,23 @@ const Page = () => {
   const [map, setMap] = useState<null>(null);
   const [mapError, setMapError] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
+
+  // api calls 
+  const callAPI = async (endpoint: string, data: any) => {
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: "POST",
+      headers: endpoint.includes("coordinates") ? {"Content-Type": "application/json"} : {},
+      body: endpoint.includes("coordinates") ? JSON.stringify(data) : data,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    return response.json();
+  }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
